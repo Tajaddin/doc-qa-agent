@@ -65,7 +65,7 @@ Write-Step "Schema smoke test"
 
 # 7. Optional: ingest + embed
 Write-Step "Optional next steps"
-Write-Host "    Ingest the 80-page corpus: $Py -m doc_qa.ingest --limit 80"
+Write-Host "    Ingest the configured corpus: $Py -m doc_qa.ingest"
 Write-Host "    Embed every chunk:         $Py -m doc_qa.embeddings"
 Write-Host "    Run the eval harness:      $Py -m eval.run_eval"
 Write-Host "    Start the API:             $Py -m uvicorn doc_qa.api:app --host 127.0.0.1 --port 8000"

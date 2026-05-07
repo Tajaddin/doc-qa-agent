@@ -3,7 +3,7 @@
 # Targets are designed to run from a fresh clone end to end:
 #   make install   -> venv + editable install
 #   make init-db   -> apply SQL migrations against $DATABASE_URL
-#   make ingest    -> crawl + chunk 80 pages from llms.txt
+#   make ingest    -> crawl + chunk the configured corpus from llms.txt
 #   make embed     -> backfill embeddings via Voyage / OpenAI
 #   make eval      -> 15 cases x 2 modes, writes eval/reports/eval_*.md
 #   make api       -> uvicorn doc_qa.api:app on 127.0.0.1:8000
@@ -35,7 +35,7 @@ init-db:
 	$(PY) -m scripts.test_db
 
 ingest:
-	$(PY) -m doc_qa.ingest --limit 80
+	$(PY) -m doc_qa.ingest
 
 embed:
 	$(PY) -m doc_qa.embeddings

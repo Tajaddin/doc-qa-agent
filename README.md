@@ -137,9 +137,13 @@ python -m scripts.test_hybrid          # 0 rows expected, table is empty
 Crawl, chunk, ingest:
 
 ```
-python -m doc_qa.ingest --limit 80
+python -m doc_qa.ingest          # uses CRAWL_MAX_PAGES + CRAWL_PATH_DENY from .env
 python -m scripts.peek_db
 ```
+
+The default `.env` settings produce a 99-page conceptual corpus (max 200,
+minus the auto-generated SDK / endpoint reference pages under
+`/docs/en/api/`). Adjust the env vars to widen or narrow.
 
 Embed every chunk (around a minute on Voyage with billing enabled):
 
@@ -237,8 +241,8 @@ to the project venv. After install, fully quit and reopen Cowork. See
 
 ```
 python -m doc_qa.ingest --limit 10 --dry-run --sample
-python -m doc_qa.ingest --limit 80
-python -m doc_qa.ingest               # uses CRAWL_MAX_PAGES from .env
+python -m doc_qa.ingest               # default: uses CRAWL_MAX_PAGES + CRAWL_PATH_DENY from .env
+python -m doc_qa.ingest --limit 50    # override the page cap explicitly
 ```
 
 The crawler is idempotent. Re-running with the same corpus reports
