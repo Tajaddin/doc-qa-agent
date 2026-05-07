@@ -1,0 +1,50 @@
+{
+  "manifest_version": "0.2",
+  "name": "doc-qa-agent",
+  "display_name": "Doc QA Agent",
+  "version": "0.1.0",
+  "description": "Hybrid retrieval over the Anthropic developer docs with grounded Claude citations.",
+  "long_description": "Searches a Supabase + pgvector index of 80 Anthropic developer doc pages. Exposes three tools to any Claude client: search_docs (hybrid FTS + vector retrieval with reciprocal rank fusion), ask_docs (Claude Sonnet 4.6 with built-in citations over custom-content document blocks), and list_sources (corpus inventory). The same retrieval engine also powers a FastAPI /ask endpoint in the project.",
+  "author": {
+    "name": "Tajaddin Gafarov"
+  },
+  "license": "MIT",
+  "keywords": [
+    "mcp",
+    "docs",
+    "rag",
+    "anthropic",
+    "claude",
+    "supabase",
+    "pgvector",
+    "voyage",
+    "citations"
+  ],
+  "server": {
+    "type": "python",
+    "entry_point": "noop.py",
+    "mcp_config": {
+      "command": "${user_config.python_path}",
+      "args": ["-m", "doc_qa.mcp_server"],
+      "env": {
+        "PYTHONIOENCODING": "utf-8"
+      }
+    }
+  },
+  "user_config": {
+    "python_path": {
+      "type": "file",
+      "title": "Python interpreter (project venv)",
+      "description": "Absolute path to the doc-qa-agent venv python.exe. Replace the placeholder default with the path on your machine. The server runs with this interpreter so it inherits the deps installed by pip install -e . (anthropic, voyageai, psycopg, pgvector, mcp).",
+      "required": true,
+      "default": "C:\\path\\to\\doc-qa-agent\\.venv\\Scripts\\python.exe"
+    }
+  },
+  "compatibility": {
+    "platforms": ["win32", "darwin", "linux"],
+    "runtimes": {
+      "python": ">=3.10"
+    }
+  },
+  "tools_generated": true
+}

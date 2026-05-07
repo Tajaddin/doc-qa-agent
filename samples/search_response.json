@@ -1,0 +1,36 @@
+{
+  "query": "What pricing applies to batch processing requests in Claude?",
+  "mode": "hybrid",
+  "results": [
+    {
+      "chunk_id": 22835,
+      "source_url": "https://platform.claude.com/docs/en/build-with-claude/batch-processing.md",
+      "source_title": "Batch processing",
+      "heading": "Extended output (beta)",
+      "score": 0.0163934426229508,
+      "fts_rank": 1,
+      "semantic_rank": null,
+      "preview": "# Extended output (beta)  The `output-300k-2026-03-24` beta header raises the `max_tokens` cap to 300,000 for batch requests using Claude Opus 4.7, Claude Opus 4.6, or Claude Sonnet 4.6. Include the header to generate outputs far longer than the standard limit (64k to 128k depend ..."
+    },
+    {
+      "chunk_id": 23119,
+      "source_url": "https://platform.claude.com/docs/en/agents-and-tools/tool-use/code-execution-tool.md",
+      "source_title": "Code execution tool",
+      "heading": "Batch requests",
+      "score": 0.0163934426229508,
+      "fts_rank": null,
+      "semantic_rank": 1,
+      "preview": "# Batch requests  You can include the code execution tool in the [Messages Batches API](/docs/en/build-with-claude/batch-processing). Code execution tool calls through the Messages Batches API are priced the same as those in regular Messages API requests."
+    },
+    {
+      "chunk_id": 22794,
+      "source_url": "https://platform.claude.com/docs/en/build-with-claude/batch-processing.md",
+      "source_title": "Batch processing",
+      "heading": "Pricing",
+      "score": 0.0161290322580645,
+      "fts_rank": null,
+      "semantic_rank": 2,
+      "preview": "# Pricing  The Batches API offers significant cost savings. All usage is charged at 50% of the standard API prices.  | Model             | Batch input      | Batch output    | |-------------------|------------------|-----------------| | Claude Opus 4.7       | $2.50 / MTok     |  ..."
+    }
+  ]
+}

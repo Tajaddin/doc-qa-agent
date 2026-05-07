@@ -1,0 +1,8 @@
+{
+  "status": "ok",
+  "sources": 99,
+  "chunks": 2633,
+  "chunks_with_embeddings": 2633,
+  "embedding_provider": "voyage",
+  "answer_model": "claude-sonnet-4-6"
+}
