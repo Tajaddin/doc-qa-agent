@@ -120,7 +120,7 @@ copy .env.example .env                  # then fill in the keys
 
 - `ANTHROPIC_API_KEY` from console.anthropic.com.
 - `VOYAGE_API_KEY` from dash.voyageai.com (free 200M tokens once a payment
-  method is on file). Or `OPENAI_API_KEY`. The provider auto-resolves; force
+  method is on file). Or `OPENAI_API_KEY`. The provider auto-resolves. Force
   one with `EMBEDDING_PROVIDER`.
 - `DATABASE_URL`. Either a Supabase connection URI (Session pooler at port
   5432 works on free tier IPv4) or `postgresql://docqa:docqa@localhost:5432/docqa`
@@ -296,7 +296,7 @@ What the numbers say:
   Hybrid scores faith=1, compl=0.35. The model's answer is faithful (POST
   to sessions endpoint with agent_id) but pads with extra context the
   narrowly-scoped gold does not anticipate. This is an eval-design
-  observation rather than a system bug; the question would benefit from
+  observation rather than a system bug. The question would benefit from
   either a broader gold or a sharper question wording, both noted in
   `EVAL.md`.
 
@@ -304,7 +304,7 @@ What the numbers say:
 `eval/reports/eval_<UTC timestamp>.{md,json}` on every run.
 
 The eval is the section the brief flagged as the highest-signal piece, so the
-report calls out failure modes explicitly with judge reasoning, not just
+report calls out failure modes explicitly with judge reasoning, not only
 aggregate scores.
 
 ## Tests
@@ -322,7 +322,7 @@ make test
 ```
 
 The tests caught a real bug: the metrics suite found an order-of-operations
-bug in `_normalize` that would have under-scored hit@k on URLs carrying both
+bug in `_normalize` which would have under-scored hit@k on URLs carrying both
 a query string and a trailing slash. Fix is in `eval/run_eval.py`. The API
 suite exercises the request-id middleware, the AppError exception handler,
 and Pydantic input validation.
@@ -346,9 +346,9 @@ covers.
 - Voyage 3-large free tier without a payment method is throttled to 3 RPM /
   10K TPM, too slow for a 99-page corpus. With a payment method on file the
   free 200M tokens still apply, so a 99-page ingest costs $0. The OpenAI
-  fallback path is wired and tested if you prefer that route.
+  fallback path is wired and tested if you prefer the OpenAI route.
 - Claude Cowork integration ships as an MCPB extension at
-  `cowork-extension/doc-qa-agent.mcpb` (1.2 kB; references the venv via
+  `cowork-extension/doc-qa-agent.mcpb` (1.2 kB, references the venv via
   `${user_config.python_path}` instead of bundling 500 MB of Python deps).
   Two install paths in `cowork-extension/INSTALL.md`. Same retrieval engine,
   third client surface alongside FastAPI and Claude Code.
@@ -415,7 +415,7 @@ doc-qa-agent/
 
 - `answer.py` sends each retrieved chunk as a `type: "document"` block with
   `source.type: "content"` (custom content, one text block per chunk) and
-  `citations: { "enabled": true }`. That gives chunk-level citation
+  `citations: { "enabled": true }`. The result is chunk-level citation
   granularity. Citation objects map back to the chunk via `document_index`.
 - `title` and `context` on each document carry the heading and source URL
   for grounding without polluting citation spans (the docs explicitly note
