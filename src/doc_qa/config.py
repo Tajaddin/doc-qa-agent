@@ -25,6 +25,10 @@ class Settings(BaseSettings):
     anthropic_api_key: str = Field(default="", alias="ANTHROPIC_API_KEY")
     answer_model: str = Field(default="claude-sonnet-4-6", alias="ANSWER_MODEL")
     judge_model: str = Field(default="claude-haiku-4-5", alias="JUDGE_MODEL")
+    # Extra models a /ask client may request, comma-separated. ANSWER_MODEL is
+    # always allowed; anything else is refused so a caller cannot pick the
+    # most expensive model on the operator's key.
+    allowed_models: str = Field(default="", alias="ALLOWED_MODELS")
 
     # ----- Embeddings -----
     voyage_api_key: str = Field(default="", alias="VOYAGE_API_KEY")
@@ -81,6 +85,11 @@ class Settings(BaseSettings):
         if self.openai_api_key:
             return "openai"
         return "none"
+
+    @property
+    def allowed_model_ids(self) -> set[str]:
+        extra = {m.strip() for m in self.allowed_models.split(",") if m.strip()}
+        return {self.answer_model} | extra
 
     @property
     def path_allow_prefixes(self) -> list[str]:

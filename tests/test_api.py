@@ -19,6 +19,7 @@ from unittest.mock import MagicMock
 import pytest
 from fastapi.testclient import TestClient
 
+from doc_qa.answer import AnswerResult
 from doc_qa.api import app
 from doc_qa.config import settings
 from doc_qa.retrieve import RetrievedChunk
@@ -133,3 +134,37 @@ def test_ask_returns_config_error_when_anthropic_key_missing(client, monkeypatch
 def test_ask_validates_empty_question(client):
     r = client.post("/ask", json={"question": "", "k": 5})
     assert r.status_code == 422
+
+
+def _fake_answer(question, *, k, candidates, mode, model):
+    return AnswerResult(
+        question=question,
+        answer="ok",
+        citations=[],
+        sources=[],
+        retrieved_chunks=[],
+        model=model or settings.answer_model,
+    )
+
+
+def test_ask_rejects_a_model_outside_the_allowlist(client, monkeypatch):
+    called = []
+    monkeypatch.setattr(settings, "anthropic_api_key", "test-key")
+    monkeypatch.setattr(settings, "allowed_models", "")
+    monkeypatch.setattr(
+        "doc_qa.api.answer_question", lambda *a, **kw: called.append(kw) or _fake_answer(*a, **kw)
+    )
+    r = client.post("/ask", json={"question": "hello", "model": "claude-opus-4-1"})
+    assert r.status_code == 400
+    assert r.json()["error"] == "model_not_allowed"
+    assert called == []
+
+
+def test_ask_accepts_the_answer_model_and_listed_models(client, monkeypatch):
+    monkeypatch.setattr(settings, "anthropic_api_key", "test-key")
+    monkeypatch.setattr(settings, "allowed_models", "claude-haiku-4-5, claude-opus-4-1")
+    monkeypatch.setattr("doc_qa.api.answer_question", _fake_answer)
+    for model in [settings.answer_model, "claude-opus-4-1", None]:
+        r = client.post("/ask", json={"question": "hello", "model": model})
+        assert r.status_code == 200, r.json()
+        assert r.json()["model"] == (model or settings.answer_model)

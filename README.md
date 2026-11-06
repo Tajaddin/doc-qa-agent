@@ -183,6 +183,9 @@ curl.exe http://127.0.0.1:8000/healthz
 }
 ```
 
+The request may name a `model`. It must be `ANSWER_MODEL` or one listed in
+`ALLOWED_MODELS` (comma-separated); any other model gets 400 `model_not_allowed`.
+
 `POST /search` returns the chunk pool with FTS rank, semantic rank, and the
 fused RRF score for each hit. Useful for the demo because the ranks expose
 which side of the hybrid contributed each result.

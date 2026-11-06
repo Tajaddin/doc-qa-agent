@@ -74,6 +74,11 @@ class AnswerError(AppError):
     code = "answer_failed"
 
 
+class ModelNotAllowedError(AppError):
+    status_code = 400
+    code = "model_not_allowed"
+
+
 # ---------- schemas ----------
 
 class HealthResponse(BaseModel):
@@ -241,6 +246,10 @@ def search_route(req: SearchRequest) -> SearchResponse:
 
 @app.post("/ask", response_model=AskResponse)
 def ask_route(req: AskRequest, request: Request) -> AskResponse:
+    if req.model is not None and req.model not in settings.allowed_model_ids:
+        raise ModelNotAllowedError(
+            f"model {req.model!r} is not allowed; set ALLOWED_MODELS to permit it"
+        )
     if not settings.anthropic_api_key:
         raise ConfigError("ANTHROPIC_API_KEY not set")
 
