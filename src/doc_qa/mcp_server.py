@@ -30,9 +30,15 @@ from pydantic import BaseModel
 
 from doc_qa.answer import answer as answer_question
 from doc_qa.db import get_conn
-from doc_qa.retrieve import search
+from doc_qa.retrieve import MAX_K, search
 
 mcp = FastMCP("doc-qa-agent")
+
+MAX_SOURCES = 200
+
+
+def _clamp(value: int, high: int) -> int:
+    return max(1, min(value, high))
 
 
 # ---------- output schemas ----------
@@ -91,8 +97,9 @@ def search_docs(
     reciprocal rank fusion. Mode "vector" runs pure semantic search.
 
     Use this when you want raw passages without an LLM-generated answer.
+    k is capped at 20.
     """
-    chunks = search(query, k=k, mode=mode)
+    chunks = search(query, k=_clamp(k, MAX_K), mode=mode)
     return [
         SearchHit(
             chunk_id=c.chunk_id,
@@ -117,8 +124,9 @@ def ask_docs(question: str, k: int = 5) -> AskAnswer:
     structured citation list mapped back to source URLs.
 
     Use this when you want a concise answer with provenance, not raw chunks.
+    k is capped at 20.
     """
-    result = answer_question(question, k=k, mode="hybrid")
+    result = answer_question(question, k=_clamp(k, MAX_K), mode="hybrid")
     return AskAnswer(
         answer=result.answer,
         citations=[
@@ -143,6 +151,7 @@ def list_sources(limit: int = 20) -> list[SourceRow]:
     """List indexed source pages ordered by chunk count, descending.
 
     Use this to inspect what documentation is in the corpus before searching.
+    limit is capped at 200.
     """
     with get_conn() as conn:
         with conn.cursor() as cur:
@@ -150,7 +159,7 @@ def list_sources(limit: int = 20) -> list[SourceRow]:
                 "select s.source_url, s.title, "
                 "(select count(*) from chunks where source_id = s.id) as nchunks "
                 "from sources s order by nchunks desc limit %s",
-                (limit,),
+                (_clamp(limit, MAX_SOURCES),),
             )
             rows = cur.fetchall()
     return [SourceRow(url=r[0], title=r[1], chunks=r[2]) for r in rows]

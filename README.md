@@ -183,6 +183,9 @@ curl.exe http://127.0.0.1:8000/healthz
 }
 ```
 
+The request may name a `model`. It must be `ANSWER_MODEL` or one listed in
+`ALLOWED_MODELS` (comma-separated); any other model gets 400 `model_not_allowed`.
+
 `POST /search` returns the chunk pool with FTS rank, semantic rank, and the
 fused RRF score for each hit. Useful for the demo because the ranks expose
 which side of the hybrid contributed each result.
@@ -309,11 +312,12 @@ aggregate scores.
 
 ## Tests
 
-32 pytest cases. 25 unit tests over pure-Python pieces (chunker including
+45 pytest cases. 25 unit tests over pure-Python pieces (chunker including
 table isolation, retrieval metric helpers, crawler URL filters with deny
-list, markdown cleaner, checksums) and 7 integration tests over the FastAPI
-app via TestClient with mocked DB and embedding clients. No DB or network
-required to run any of them.
+list, markdown cleaner, checksums), 11 over the MCP tools' `k` and `limit`
+caps, and 9 integration tests over the FastAPI app via TestClient with
+mocked DB and embedding clients. No DB or network required to run any of
+them.
 
 ```
 make test
@@ -402,6 +406,7 @@ doc-qa-agent/
                               fenced-code safety, target tokens)
     test_metrics.py           hit@k, recall@k, MRR, citation_metrics
     test_crawl.py             llms.txt parser, URL filter, markdown cleaner
+    test_mcp_server.py        MCP tool argument caps
   Makefile                    install / init-db / ingest / embed / eval / api / mcp / test
   setup.ps1                   one-shot Windows setup script
   EVAL.md                     eval methodology, why each metric, known limits

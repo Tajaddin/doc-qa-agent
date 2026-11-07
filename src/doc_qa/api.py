@@ -38,7 +38,7 @@ from doc_qa.answer import AnswerResult
 from doc_qa.answer import answer as answer_question
 from doc_qa.config import settings
 from doc_qa.db import get_conn
-from doc_qa.retrieve import RetrievedChunk, SearchMode, search
+from doc_qa.retrieve import MAX_K, RetrievedChunk, SearchMode, search
 
 logger = logging.getLogger("doc_qa.api")
 if not logger.handlers:
@@ -74,6 +74,11 @@ class AnswerError(AppError):
     code = "answer_failed"
 
 
+class ModelNotAllowedError(AppError):
+    status_code = 400
+    code = "model_not_allowed"
+
+
 # ---------- schemas ----------
 
 class HealthResponse(BaseModel):
@@ -87,7 +92,7 @@ class HealthResponse(BaseModel):
 
 class SearchRequest(BaseModel):
     query: str = Field(..., min_length=1, max_length=2000)
-    k: int = Field(default=5, ge=1, le=20)
+    k: int = Field(default=5, ge=1, le=MAX_K)
     mode: SearchMode = "hybrid"
     candidates: int = Field(default=20, ge=1, le=50)
 
@@ -111,7 +116,7 @@ class SearchResponse(BaseModel):
 
 class AskRequest(BaseModel):
     question: str = Field(..., min_length=1, max_length=2000)
-    k: int = Field(default=5, ge=1, le=20)
+    k: int = Field(default=5, ge=1, le=MAX_K)
     mode: SearchMode = "hybrid"
     candidates: int = Field(default=20, ge=1, le=50)
     model: str | None = None
@@ -241,6 +246,10 @@ def search_route(req: SearchRequest) -> SearchResponse:
 
 @app.post("/ask", response_model=AskResponse)
 def ask_route(req: AskRequest, request: Request) -> AskResponse:
+    if req.model is not None and req.model not in settings.allowed_model_ids:
+        raise ModelNotAllowedError(
+            f"model {req.model!r} is not allowed; set ALLOWED_MODELS to permit it"
+        )
     if not settings.anthropic_api_key:
         raise ConfigError("ANTHROPIC_API_KEY not set")
 

@@ -18,6 +18,9 @@ from doc_qa.embeddings import EmbeddingClient, get_embedding_client
 
 SearchMode = Literal["hybrid", "vector"]
 
+# Most chunks any caller (HTTP or MCP) may pull into one search or answer.
+MAX_K = 20
+
 
 @dataclass(slots=True)
 class RetrievedChunk:
